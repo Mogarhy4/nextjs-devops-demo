@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nextjs-web-deployment
+  labels:
+    app: nextjs-web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nextjs-web
+  template:
+    metadata:
+      labels:
+        app: nextjs-web
+    spec:
+      containers:
+      - name: nextjs-app
+        image: nextjs-devops-demo:v1
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 3000
+        env:
+        - name: APP_ENV
+          value: "Production-K8s-Cluster"
+        - name: DATABASE_HOST
+          value: "postgres-service.default.svc.cluster.local"
+        - name: SUPER_SECRET_KEY
+          value: "your_secret_api_key_here"
+        # --- UPDATE THESE TWO TO USE THE SECRET ---
+        - name: DATABASE_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: postgres-username
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: postgres-password
