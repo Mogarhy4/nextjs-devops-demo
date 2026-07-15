@@ -1,0 +1,37 @@
+name: CI-CD Build Pipeline
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Pull the code from GitHub to the virtual runner
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # 2. Set up Node.js environment
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    # 3. Install fresh dependencies
+    - name: Install Dependencies
+      run: npm ci
+
+    # 4. Build the production Next.js application
+    - name: Build Next.js Application
+      run: npm run build
+
+    # 5. Build and verify the Docker Image
+    - name: Build Docker Image
+      run: |
+        docker build -t nextjs-devops-demo:latest .
+        echo "Docker image built successfully!"
